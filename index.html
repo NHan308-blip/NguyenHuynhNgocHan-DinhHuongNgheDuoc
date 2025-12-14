@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Định Hướng Ngành Dược - Cổng Thông Tin</title>
+    <!-- 1. Cài đặt Tailwind CSS để trang trí đẹp -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. Cấu hình Import Map để tải thư viện trực tiếp từ mạng -->
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "lucide-react": "https://esm.sh/lucide-react@0.344.0"
+      }
+    }
+    </script>
+    
+    <!-- 3. Cài đặt Babel để trình duyệt hiểu được code React -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Style bổ sung cho hiệu ứng nền -->
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* Hiệu ứng nền trôi */
+        .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.5; animation: float 10s infinite ease-in-out; }
+        @keyframes float { 0% { transform: translate(0, 0); } 50% { transform: translate(30px, -30px); } 100% { transform: translate(0, 0); } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 overflow-x-hidden">
+    <!-- Nơi ứng dụng sẽ hiển thị -->
+    <div id="root"></div>
+
+    <!-- CODE LOGIC ỨNG DỤNG -->
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { 
+            Activity, HeartPulse, Leaf, Factory, Microscope, Store,
+            Briefcase, Lightbulb, Map, ArrowRight, Search, X, Globe, 
+            Pill, BrainCircuit, DollarSign, GraduationCap, Award, 
+            Clock, BarChart3, ChevronRight, FileBadge, Syringe, Thermometer
+        } from 'lucide-react';
+
+        const App = () => {
+            const [lang, setLang] = useState('vi'); 
+            const [view, setView] = useState('home'); 
+            const [currentQ, setCurrentQ] = useState(0);
+            const [scores, setScores] = useState({ LS: 0, CN: 0, KN: 0, KT: 0, DL: 0 });
+            const [selectedSpec, setSelectedSpec] = useState(null);
+            const [showDetailModal, setShowDetailModal] = useState(null);
+
+            // --- NỀN HỌA TIẾT Y TẾ ---
+            const MedicalBackground = () => (
+                <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none select-none">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-cyan-50"></div>
+                    <div className="blob bg-blue-200 w-96 h-96 top-[-50px] left-[-50px]"></div>
+                    <div className="blob bg-cyan-200 w-80 h-80 bottom-[-50px] right-[-50px]" style={{animationDelay: '2s'}}></div>
+                    
+                    {/* Icon chìm trang trí */}
+                    <div className="absolute top-[10%] left-[10%] text-blue-200 opacity-30 transform -rotate-12"><Pill size={120} /></div>
+                    <div className="absolute top-[20%] right-[10%] text-cyan-200 opacity-30 transform rotate-45"><Microscope size={100} /></div>
+                    <div className="absolute bottom-[20%] left-[10%] text-indigo-200 opacity-20 transform rotate-12"><Factory size={140} /></div>
+                    <div className="absolute bottom-[10%] right-[20%] text-teal-200 opacity-30"><HeartPulse size={130} /></div>
+                </div>
+            );
+
+            // --- DỮ LIỆU ---
+            const t = {
+                vi: {
+                    title: "Cổng Thông Tin Định Hướng Dược",
+                    subtitle: "Hệ thống định hướng nghề nghiệp chuyên sâu chuẩn Bộ Y tế",
+                    startBtn: "Bắt đầu Trắc nghiệm (20 câu)",
+                    exploreBtn: "Tra cứu thông tin 5 Chuyên ngành",
+                    analyzing: "Đang phân tích dữ liệu...",
+                    resultTitle: "Kết quả Định hướng Nghề nghiệp",
+                    matchRole: "Chuyên ngành phù hợp nhất (Top 1):",
+                    backupRole: "Chuyên ngành tiềm năng (Top 2):",
+                    viewRoadmap: "Xem lộ trình thăng tiến & Chứng chỉ",
+                    roadmapTitle: "Lộ trình Phát triển Sự nghiệp",
+                    back: "Quay lại",
+                    home: "Trang chủ",
+                    salary: "Thu nhập:",
+                    intern: "Thực tập:",
+                    duration: "Thời gian:",
+                    skills: "Kỹ năng:",
+                    certs: "Bằng cấp & Chứng chỉ:",
+                    roles: "Vị trí nghề nghiệp:",
+                    meaning: "Sứ mệnh & Ý nghĩa xã hội:",
+                    questionProgress: "Câu hỏi",
+                    specNames: {
+                        LS: "Dược Lâm sàng",
+                        DL: "Dược liệu & Dược học cổ truyền",
+                        CN: "Sản xuất & Phát triển thuốc",
+                        KN: "Kiểm tra Chất lượng thuốc",
+                        KT: "Quản lý & Cung ứng thuốc"
+                    }
+                },
+                en: {
+                    title: "Pharmacy Career Portal",
+                    subtitle: "Professional career guidance system (MOH Standard)",
+                    startBtn: "Start Assessment (20 Qs)",
+                    exploreBtn: "Explore 5 Specializations",
+                    analyzing: "Processing data...",
+                    resultTitle: "Career Orientation Result",
+                    matchRole: "Best Match (Top 1):",
+                    backupRole: "Potential Match (Top 2):",
+                    viewRoadmap: "View Roadmap & Certificates",
+                    roadmapTitle: "Career Development Roadmap",
+                    back: "Back",
+                    home: "Home",
+                    salary: "Income:",
+                    intern: "Internship:",
+                    duration: "Duration:",
+                    skills: "Skills:",
+                    certs: "Degrees & Certificates:",
+                    roles: "Job Positions:",
+                    meaning: "Mission & Social Impact:",
+                    questionProgress: "Question",
+                    specNames: {
+                        LS: "Clinical Pharmacy",
+                        DL: "Medicinal Materials & TCM",
+                        CN: "Drug Production & Development",
+                        KN: "Drug Quality Testing",
+                        KT: "Drug Management & Supply"
+                    }
+                }
+            };
+
+            const specsData = {
+                LS: {
+                    id: 'LS', icon: <HeartPulse className="w-10 h-10" />, color: 'text-blue-800', bg: 'bg-blue-50', border: 'border-blue-200', btn: 'bg-blue-700 hover:bg-blue-800',
+                    content: {
+                        vi: {
+                            desc: 'Tối ưu hóa việc sử dụng thuốc, đảm bảo an toàn và hiệu quả cho người bệnh tại các cơ sở y tế.',
+                            meaning: 'Bạn là "lá chắn an toàn" cuối cùng của bệnh nhân. Kiến thức của bạn giúp giảm thiểu sai sót y khoa, tiết kiệm chi phí điều trị.',
+                            roles: ['DS Lâm sàng (Nội/Ngoại/ICU)', 'DS Thông tin thuốc', 'DS Cảnh giác dược (PV)', 'DS Nhà thuốc bệnh viện', 'Chuyên viên Dược chính sách BHYT'],
+                            roadmap: [
+                                { level: 'Sinh viên (Năm 4-5)', salary: '0 đ (Học việc)', intern: 'Bệnh viện Đa khoa', duration: '3 - 6 tháng', skills: 'Dược lý, Tương tác thuốc', certs: 'Bảng điểm các môn Lâm sàng' },
+                                { level: 'Tập sự (Sau tốt nghiệp)', salary: '5 - 7 triệu', intern: 'Khoa Dược Bệnh viện', duration: '18 tháng (Bắt buộc)', skills: 'Đọc bệnh án, Kỹ năng giao tiếp', certs: 'Bằng Dược sĩ ĐH' },
+                                { level: 'Dược sĩ Lâm sàng', salary: '10 - 15 triệu', intern: 'Không', duration: 'Làm chính thức', skills: 'Phân tích ca lâm sàng, Tư vấn', certs: 'Chứng chỉ hành nghề (CCHN) Dược, CME' },
+                                { level: 'Trưởng Khoa / Chuyên gia', salary: '25 - 40+ triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Quản lý, Xây dựng phác đồ', certs: 'CKI, CKII, Thạc sĩ Dược lý - DSLS' }
+                            ]
+                        },
+                        en: { desc: 'Optimize drug use, ensure safety.', meaning: 'Patient safety shield.', roles: ['Clinical Pharmacist', 'Drug Info'], roadmap: [{ level: 'Student', salary: 'None', intern: 'Hospital', duration: '3-6mo', skills: 'Pharmacology', certs: 'Transcript' }] }
+                    }
+                },
+                DL: {
+                    id: 'DL', icon: <Leaf className="w-10 h-10" />, color: 'text-teal-700', bg: 'bg-teal-50', border: 'border-teal-200', btn: 'bg-teal-700 hover:bg-teal-800',
+                    content: {
+                        vi: {
+                            desc: 'Nghiên cứu, phát triển và chuẩn hóa các sản phẩm từ dược liệu và bài thuốc cổ truyền.',
+                            meaning: 'Bạn là người "thổi hồn" vào cây cỏ, biến kinh nghiệm dân gian thành sản phẩm khoa học.',
+                            roles: ['Nghiên cứu viên (R&D) Dược liệu', 'Quản lý vùng trồng (GACP)', 'Kiểm nghiệm Dược liệu', 'Sản xuất Đông dược', 'Kinh doanh Dược liệu'],
+                            roadmap: [
+                                { level: 'Sinh viên', salary: 'Hỗ trợ', intern: 'Viện Dược liệu / Vườn', duration: '2 - 3 tháng', skills: 'Thực vật học', certs: 'Chứng nhận thực tập' },
+                                { level: 'KTV / Dược sĩ', salary: '8 - 12 triệu', intern: 'Công ty Đông dược', duration: 'Thử việc 2 tháng', skills: 'Chiết xuất, Bào chế đông dược', certs: 'Bằng ĐH/CĐ Dược' },
+                                { level: 'Chuyên gia R&D', salary: '15 - 25 triệu', intern: 'Không', duration: 'Làm chính thức', skills: 'Phát triển sản phẩm mới, GACP', certs: 'Chứng chỉ GACP-WHO' },
+                                { level: 'Giám đốc Dự án', salary: '30 - 50 triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Quản lý dự án, Xuất khẩu', certs: 'Tiến sĩ' }
+                            ]
+                        },
+                        en: { desc: 'Research herbal products.', meaning: 'Preserve genetic resources.', roles: ['Herbal Researcher', 'Farm Manager'], roadmap: [{ level: 'Student', salary: 'Allowance', intern: 'Institute', duration: '2-3mo', skills: 'Botany', certs: 'Intern Cert' }] }
+                    }
+                },
+                CN: {
+                    id: 'CN', icon: <Factory className="w-10 h-10" />, color: 'text-indigo-800', bg: 'bg-indigo-50', border: 'border-indigo-200', btn: 'bg-indigo-700 hover:bg-indigo-800',
+                    content: {
+                        vi: {
+                            desc: 'Nghiên cứu công thức, quy trình sản xuất và đăng ký lưu hành thuốc tại các nhà máy Dược phẩm.',
+                            meaning: 'Bạn là "kiến trúc sư" tạo ra viên thuốc. Đảm bảo thuốc sản xuất ra có chất lượng đồng nhất.',
+                            roles: ['R&D Bào chế', 'R&D Phương pháp phân tích', 'Chuyên viên Đăng ký thuốc (RA)', 'Giám sát sản xuất', 'Kế hoạch sản xuất'],
+                            roadmap: [
+                                { level: 'Sinh viên', salary: 'Phụ cấp', intern: 'Nhà máy GMP', duration: '3 - 6 tháng', skills: 'Bào chế, Công nghiệp dược', certs: 'Tiếng Anh chuyên ngành' },
+                                { level: 'Nhân viên', salary: '9 - 14 triệu', intern: 'Nhà máy', duration: 'Thử việc 2 tháng', skills: 'Vận hành máy, SOP', certs: 'Chứng chỉ GMP' },
+                                { level: 'Quản lý R&D', salary: '20 - 35 triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Quản lý dự án, Công thức', certs: 'Thạc sĩ CN Dược' },
+                                { level: 'GĐ Nhà máy', salary: '50 - 100 triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Chiến lược, Tối ưu', certs: 'MBA, Six Sigma' }
+                            ]
+                        },
+                        en: { desc: 'Formulation research and production.', meaning: 'Architect of medicine.', roles: ['Formulation R&D', 'RA'], roadmap: [{ level: 'Student', salary: 'Allowance', intern: 'Factory', duration: '3-6mo', skills: 'Pharmaceutics', certs: 'English' }] }
+                    }
+                },
+                KN: {
+                    id: 'KN', icon: <Microscope className="w-10 h-10" />, color: 'text-cyan-800', bg: 'bg-cyan-50', border: 'border-cyan-200', btn: 'bg-cyan-700 hover:bg-cyan-800',
+                    content: {
+                        vi: {
+                            desc: 'Kiểm tra, giám sát chất lượng thuốc thông qua các phép thử hóa lý, vi sinh.',
+                            meaning: 'Bạn là "người gác cổng" nghiêm khắc. Chữ ký của bạn là lời cam kết về sự an toàn.',
+                            roles: ['Kiểm nghiệm viên Hóa lý', 'Kiểm nghiệm viên Vi sinh', 'Chuyên viên QA', 'Thẩm định viên', 'IPC'],
+                            roadmap: [
+                                { level: 'Sinh viên', salary: 'Phụ cấp', intern: 'Phòng Lab', duration: '2 - 3 tháng', skills: 'Hóa phân tích, Cẩn thận', certs: 'Bảng điểm Hóa' },
+                                { level: 'Kiểm nghiệm viên', salary: '8 - 13 triệu', intern: 'Phòng QC', duration: 'Thử việc 2 tháng', skills: 'HPLC, GC, Vi sinh', certs: 'GLP, ISO 17025' },
+                                { level: 'Trưởng nhóm', salary: '16 - 25 triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Thẩm định phương pháp', certs: 'Chứng chỉ Thẩm định' },
+                                { level: 'GĐ Chất lượng', salary: '40 - 60 triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Quản lý rủi ro', certs: 'Lead Auditor' }
+                            ]
+                        },
+                        en: { desc: 'Test drug quality.', meaning: 'Strict gatekeeper.', roles: ['QC Analyst', 'QA'], roadmap: [{ level: 'Student', salary: 'Allowance', intern: 'Lab', duration: '2-3mo', skills: 'Analytical Chem', certs: 'Transcript' }] }
+                    }
+                },
+                KT: {
+                    id: 'KT', icon: <Store className="w-10 h-10" />, color: 'text-sky-800', bg: 'bg-sky-50', border: 'border-sky-200', btn: 'bg-sky-700 hover:bg-sky-800',
+                    content: {
+                        vi: {
+                            desc: 'Quản lý chuỗi cung ứng, kinh doanh, tiếp thị và đấu thầu thuốc vào bệnh viện.',
+                            meaning: 'Bạn là "cầu nối" đưa thuốc đến tay người cần. Đảm bảo dòng chảy của thuốc thông suốt.',
+                            roles: ['Trình dược viên', 'Quản lý sản phẩm (PM)', 'Key Account Manager (KAM)', 'Chuyên viên Đấu thầu', 'Chuỗi cung ứng'],
+                            roadmap: [
+                                { level: 'Sinh viên', salary: 'Hoa hồng', intern: 'Nhà thuốc', duration: 'Part-time', skills: 'Giao tiếp, Tin học', certs: 'Kỹ năng mềm' },
+                                { level: 'Nhân viên', salary: '10 - 20 triệu', intern: 'Công ty Dược', duration: '1 tháng', skills: 'Bán hàng', certs: 'Thẻ Trình dược viên' },
+                                { level: 'Quản lý', salary: '30 - 50 triệu', intern: 'Không', duration: 'Chính thức', skills: 'Marketing', certs: 'MBA' },
+                                { level: 'GĐ Kinh doanh', salary: '60 - 100+ triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Chiến lược, Tài chính', certs: 'Lãnh đạo cao cấp' }
+                            ]
+                        },
+                        en: { desc: 'Supply chain and sales.', meaning: 'Bridge delivering drugs.', roles: ['Medical Rep', 'PM'], roadmap: [{ level: 'Student', salary: 'Commission', intern: 'Pharmacy', duration: 'Part-time', skills: 'Comm', certs: 'Soft Skills' }] }
+                    }
+                }
+            };
+
+            const questions = [
+                { q: { vi: "Bạn thích môi trường làm việc như thế nào?", en: "Preferred work environment?" }, options: [{ t: { vi: "Yên tĩnh, sạch sẽ, máy lạnh (Lab)", en: "Quiet Lab" }, s: { KN: 3, CN: 2 } }, { t: { vi: "Năng động, di chuyển nhiều", en: "Dynamic" }, s: { KT: 3, LS: 1 } }, { t: { vi: "Bệnh viện, tiếp xúc bệnh nhân", en: "Hospital" }, s: { LS: 3 } }, { t: { vi: "Gần gũi thiên nhiên, cây cỏ", en: "Nature" }, s: { DL: 3 } }] },
+                { q: { vi: "Bạn muốn làm việc với đối tượng nào chính?", en: "Work with?" }, options: [{ t: { vi: "Con người (BN/BS)", en: "People" }, s: { LS: 3, KT: 3 } }, { t: { vi: "Máy móc công nghệ", en: "Machines" }, s: { CN: 3 } }, { t: { vi: "Số liệu, Mẫu thử", en: "Data" }, s: { KN: 3 } }, { t: { vi: "Dược liệu, Thảo mộc", en: "Herbs" }, s: { DL: 3 } }] },
+                { q: { vi: "Môn học hứng thú nhất?", en: "Fav subject?" }, options: [{ t: { vi: "Hóa phân tích, Kiểm nghiệm", en: "Analytical Chem" }, s: { KN: 3, CN: 1 } }, { t: { vi: "Dược lý, Lâm sàng", en: "Pharmacology" }, s: { LS: 3 } }, { t: { vi: "Bào chế, CN Dược", en: "Pharmaceutics" }, s: { CN: 3 } }, { t: { vi: "Kinh tế dược, Marketing", en: "Pharma Eco" }, s: { KT: 3 } }, { t: { vi: "Thực vật, Dược liệu", en: "Pharmacognosy" }, s: { DL: 3 } }] },
+                { q: { vi: "Điểm mạnh lớn nhất?", en: "Strength?" }, options: [{ t: { vi: "Thuyết phục, đàm phán", en: "Persuasion" }, s: { KT: 3 } }, { t: { vi: "Tỉ mỉ, cẩn thận", en: "Meticulous" }, s: { KN: 3, CN: 2 } }, { t: { vi: "Tư duy logic", en: "Logic" }, s: { CN: 2, LS: 2 } }, { t: { vi: "Đồng cảm, lắng nghe", en: "Empathy" }, s: { LS: 3 } }] },
+                { q: { vi: "Mục tiêu tài chính?", en: "Goal?" }, options: [{ t: { vi: "Cao, chấp nhận áp lực", en: "High/Pressure" }, s: { KT: 3 } }, { t: { vi: "Ổn định, tăng theo thâm niên", en: "Stable" }, s: { KN: 2, CN: 2, LS: 2 } }, { t: { vi: "Đủ sống, đam mê là chính", en: "Passion" }, s: { DL: 2 } }, { t: { vi: "Làm chủ doanh nghiệp", en: "Owner" }, s: { CN: 2, KT: 2 } }] },
+                { q: { vi: "Ghét điều gì nhất?", en: "Dislike?" }, options: [{ t: { vi: "Nhàm chán, lặp lại", en: "Boredom" }, s: { KT: 2, LS: 1 } }, { t: { vi: "Áp lực doanh số", en: "KPI" }, s: { KN: 2, CN: 2, LS: 2 } }, { t: { vi: "Tiếng ồn, bụi bặm", en: "Noise" }, s: { KN: 2, DL: 2 } }, { t: { vi: "Giao tiếp người lạ", en: "Strangers" }, s: { KN: 2, CN: 2 } }] },
+                { q: { vi: "Gặp vấn đề khó, bạn sẽ?", en: "Problem solving?" }, options: [{ t: { vi: "Tra cứu tài liệu", en: "Research" }, s: { LS: 2, DL: 2 } }, { t: { vi: "Phân tích số liệu", en: "Analyze" }, s: { KN: 3 } }, { t: { vi: "Hỏi chuyên gia", en: "Ask" }, s: { LS: 2, KT: 2 } }, { t: { vi: "Thử nghiệm thực tế", en: "Experiment" }, s: { CN: 3 } }] },
+                { q: { vi: "Sử dụng Tiếng Anh để?", en: "English?" }, options: [{ t: { vi: "Giao tiếp thương mại", en: "Comm" }, s: { KT: 3 } }, { t: { vi: "Đọc Dược điển", en: "Docs" }, s: { KN: 3, CN: 2 } }, { t: { vi: "Đọc Guideline", en: "Clinical" }, s: { LS: 3 } }, { t: { vi: "Tra cứu cây thuốc", en: "Plants" }, s: { DL: 3 } }] },
+                { q: { vi: "Thích thuyết trình không?", en: "Public speaking?" }, options: [{ t: { vi: "Rất thích", en: "Love it" }, s: { KT: 3 } }, { t: { vi: "Bình thường", en: "Normal" }, s: { LS: 2, CN: 1 } }, { t: { vi: "Khá ngại", en: "Shy" }, s: { KN: 3, DL: 2 } }, { t: { vi: "Chỉ nói 1-1", en: "1-on-1" }, s: { LS: 2 } }] },
+                { q: { vi: "Vật dụng thu hút nhất?", en: "Item?" }, options: [{ t: { vi: "Kính hiển vi", en: "Microscope" }, s: { KN: 3, DL: 2 } }, { t: { vi: "Ống nghe", en: "Stethoscope" }, s: { LS: 3 } }, { t: { vi: "Laptop & Hợp đồng", en: "Laptop" }, s: { KT: 3 } }, { t: { vi: "Dây chuyền máy móc", en: "Factory" }, s: { CN: 3 } }] },
+                { q: { vi: "Quan điểm về SOP?", en: "SOP?" }, options: [{ t: { vi: "Tuân thủ 100%", en: "100%" }, s: { KN: 3, CN: 3 } }, { t: { vi: "Nên linh hoạt", en: "Flexible" }, s: { KT: 2, LS: 1 } }, { t: { vi: "Gò bó", en: "Restrictive" }, s: { KT: 2 } }, { t: { vi: "Chấp nhận được", en: "Okay" }, s: { LS: 1 } }] },
+                { q: { vi: "Thuốc bị lỗi, nghĩ gì đầu tiên?", en: "Drug fail?" }, options: [{ t: { vi: "Tại sao lỗi? (Kỹ thuật)", en: "Why?" }, s: { KN: 3, CN: 3 } }, { t: { vi: "Thu hồi nhanh (Khủng hoảng)", en: "Recall" }, s: { KT: 2 } }, { t: { vi: "An toàn bệnh nhân", en: "Safety" }, s: { LS: 3 } }, { t: { vi: "Nguồn gốc nguyên liệu", en: "Origin" }, s: { DL: 2 } }] },
+                { q: { vi: "Làm việc nhóm hay độc lập?", en: "Team/Solo?" }, options: [{ t: { vi: "Độc lập", en: "Solo" }, s: { KN: 2, DL: 2 } }, { t: { vi: "Làm việc nhóm", en: "Team" }, s: { KT: 3, CN: 2, LS: 2 } }, { t: { vi: "Chỉ đạo", en: "Lead" }, s: { KT: 2, CN: 2 } }, { t: { vi: "Tùy lúc", en: "Depends" }, s: {} }] },
+                { q: { vi: "Đi công tác xa?", en: "Travel?" }, options: [{ t: { vi: "Rất thích", en: "Yes" }, s: { KT: 3, DL: 2 } }, { t: { vi: "Thỉnh thoảng", en: "Sometimes" }, s: { CN: 1 } }, { t: { vi: "Không thích", en: "No" }, s: { KN: 2, LS: 2 } }, { t: { vi: "Chỉ đi hội nghị", en: "Conference" }, s: { LS: 1 } }] },
+                { q: { vi: "Độ tỉ mỉ?", en: "Meticulous?" }, options: [{ t: { vi: "Rất cao", en: "High" }, s: { KN: 3, LS: 2 } }, { t: { vi: "Khá", en: "Good" }, s: { CN: 2, DL: 1 } }, { t: { vi: "Bình thường", en: "Avg" }, s: { KT: 3 } }, { t: { vi: "Thấp", en: "Low" }, s: {} }] },
+                { q: { vi: "Hứng thú công nghệ mới?", en: "Tech?" }, options: [{ t: { vi: "Máy móc tự động", en: "Auto" }, s: { CN: 3 } }, { t: { vi: "Phần mềm quản lý", en: "Soft" }, s: { KT: 2 } }, { t: { vi: "Thiết bị phân tích", en: "Analytical" }, s: { KN: 2 } }, { t: { vi: "Thích cổ truyền hơn", en: "Trad" }, s: { DL: 3 } }] },
+                { q: { vi: "Bạn bè hỏi thuốc?", en: "Advice?" }, options: [{ t: { vi: "Hỏi kỹ triệu chứng", en: "Symptoms" }, s: { LS: 3 } }, { t: { vi: "Chỉ chỗ mua rẻ", en: "Cheap" }, s: { KT: 2 } }, { t: { vi: "Giải thích cơ chế", en: "Mech" }, s: { LS: 2, CN: 1 } }, { t: { vi: "Khuyên dùng thảo dược", en: "Herbs" }, s: { DL: 3 } }] },
+                { q: { vi: "Sợ máu không?", en: "Blood?" }, options: [{ t: { vi: "Không sợ", en: "No" }, s: { LS: 3 } }, { t: { vi: "Hơi sợ", en: "A bit" }, s: { CN: 1, KN: 1 } }, { t: { vi: "Rất sợ", en: "Yes" }, s: { KT: 2, KN: 2, DL: 1 } }, { t: { vi: "Sợ kim tiêm", en: "Needles" }, s: {} }] },
+                { q: { vi: "Vai trò quan trọng nhất?", en: "Role?" }, options: [{ t: { vi: "Tư vấn an toàn", en: "Safety" }, s: { LS: 3 } }, { t: { vi: "Đảm bảo chất lượng", en: "Quality" }, s: { KN: 3, CN: 2 } }, { t: { vi: "Cung ứng đủ thuốc", en: "Supply" }, s: { KT: 3 } }, { t: { vi: "Phát triển thuốc nam", en: "Herbal" }, s: { DL: 3 } }] },
+                { q: { vi: "Muốn được nhớ đến là?", en: "Legacy?" }, options: [{ t: { vi: "Chuyên gia tận tâm", en: "Expert" }, s: { LS: 3 } }, { t: { vi: "Nhà quản lý tài ba", en: "Manager" }, s: { KT: 3 } }, { t: { vi: "Người tạo sản phẩm tốt", en: "Creator" }, s: { CN: 3, KN: 2 } }, { t: { vi: "Người bảo tồn giá trị", en: "Preserver" }, s: { DL: 3 } }] }
+            ];
+
+            const handleAnswer = (optionScores) => {
+                const newScores = { ...scores };
+                Object.keys(optionScores).forEach(key => newScores[key] += optionScores[key]);
+                setScores(newScores);
+                if (currentQ < questions.length - 1) setCurrentQ(currentQ + 1);
+                else { setView('analyzing'); setTimeout(() => setView('result'), 1500); }
+            };
+
+            const getSortedResults = () => Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
+            const reset = () => { setScores({ LS: 0, CN: 0, KN: 0, KT: 0, DL: 0 }); setCurrentQ(0); setView('home'); };
+
+            // COMPONENTS UI
+            const DetailModal = () => {
+                if (!showDetailModal) return null;
+                const spec = specsData[showDetailModal];
+                return (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 fade-in">
+                        <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl relative">
+                            <div className={`p-4 flex justify-between items-center border-b ${spec.border} bg-white sticky top-0 z-10`}>
+                                <div className="flex items-center gap-3">
+                                    <div className={`${spec.color} bg-slate-50 p-2 rounded-lg`}>{spec.icon}</div>
+                                    <h3 className={`text-xl font-bold ${spec.color}`}>{t[lang].specNames[spec.id]}</h3>
+                                </div>
+                                <button onClick={() => setShowDetailModal(null)} className="p-2 hover:bg-slate-100 rounded-full"><X size={24} /></button>
+                            </div>
+                            <div className="p-6 md:p-8 space-y-6">
+                                <p className="text-lg text-slate-700 leading-relaxed">{spec.content[lang].desc}</p>
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                        <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2"><Briefcase size={16} /> {t[lang].roles}</h4>
+                                        <div className="flex flex-wrap gap-2">{spec.content[lang].roles.map((r, i) => <span key={i} className="bg-white px-2 py-1 rounded border text-sm shadow-sm">{r}</span>)}</div>
+                                    </div>
+                                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                                        <h4 className="font-bold text-blue-900 mb-2 flex items-center gap-2"><Lightbulb size={16} className="text-amber-500" /> {t[lang].meaning}</h4>
+                                        <p className="italic text-blue-800">"{spec.content[lang].meaning}"</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-blue-900 mb-4 flex items-center gap-2"><Map size={16} /> {t[lang].roadmapTitle}</h4>
+                                    <div className="space-y-3">
+                                        {spec.content[lang].roadmap.map((s, i) => (
+                                            <div key={i} className="flex flex-col sm:flex-row justify-between p-4 bg-white border border-slate-200 rounded-xl hover:shadow-md transition gap-2">
+                                                <div className="flex gap-3">
+                                                    <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs mt-1">{i + 1}</div>
+                                                    <div>
+                                                        <div className="font-bold text-slate-800">{s.level}</div>
+                                                        <div className="text-xs text-slate-500 flex items-center gap-1 mt-1"><Clock size={12}/> {s.duration}</div>
+                                                    </div>
+                                                </div>
+                                                <div className="font-bold text-teal-600 self-start sm:self-center bg-teal-50 px-2 py-1 rounded">{s.salary}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="min-h-screen bg-slate-50 relative font-sans text-slate-900 pb-20">
+                    <MedicalBackground />
+                    {/* Header */}
+                    <div className="flex justify-between items-center px-4 py-3 bg-white/90 backdrop-blur-sm shadow-sm border-b border-blue-100 sticky top-0 z-40">
+                        <div className="flex items-center gap-2 cursor-pointer" onClick={reset}>
+                            <div className="bg-blue-800 p-2 rounded-lg text-white"><Pill size={24} /></div>
+                            <h1 className="font-bold text-xl text-blue-900 hidden sm:block">Pharma<span className="text-cyan-600">Career</span></h1>
+                        </div>
+                        <button onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')} className="flex items-center gap-2 px-3 py-1 rounded-full border border-blue-200 bg-blue-50 text-blue-800 text-sm font-bold hover:bg-blue-100">
+                            <Globe size={14} /> {lang === 'vi' ? 'EN' : 'VN'}
+                        </button>
+                    </div>
+
+                    <DetailModal />
+
+                    <div className="max-w-6xl mx-auto px-4 pt-8 relative z-10">
+                        {view === 'home' && (
+                            <div className="text-center fade-in flex flex-col items-center min-h-[80vh] justify-center">
+                                <div className="mb-6 bg-white p-6 rounded-full shadow-xl border-4 border-white ring-1 ring-blue-100 animate-bounce"><Activity size={64} className="text-blue-700" /></div>
+                                <h1 className="text-3xl md:text-5xl font-extrabold text-blue-900 mb-4">{t[lang].title}</h1>
+                                <p className="text-lg text-slate-600 mb-8 max-w-2xl">{t[lang].subtitle}</p>
+                                <button onClick={() => setView('quiz')} className="group bg-blue-700 hover:bg-blue-800 text-white text-lg font-bold py-4 px-10 rounded-full shadow-lg transform hover:-translate-y-1 transition mb-16 flex items-center gap-2">
+                                    {t[lang].startBtn} <ArrowRight className="group-hover:translate-x-1 transition"/>
+                                </button>
+                                
+                                <div className="w-full">
+                                    <div className="flex justify-center items-center gap-2 mb-6 text-blue-500 font-bold text-sm uppercase tracking-widest"><Search size={16}/> {t[lang].exploreBtn}</div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                                        {Object.values(specsData).map(spec => (
+                                            <div key={spec.id} onClick={() => setShowDetailModal(spec.id)} className="bg-white/80 backdrop-blur p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-xl hover:border-blue-300 cursor-pointer transition transform hover:-translate-y-1 flex flex-col items-center">
+                                                <div className={`${spec.color} bg-white p-3 rounded-xl mb-3 shadow-sm`}>{spec.icon}</div>
+                                                <h3 className="font-bold text-slate-700 text-sm text-center">{t[lang].specNames[spec.id]}</h3>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {view === 'quiz' && (
+                            <div className="max-w-2xl mx-auto fade-in mt-10">
+                                <div className="mb-6 flex justify-between text-blue-800 font-bold bg-white/50 p-2 rounded-lg">
+                                    <span className="flex items-center gap-2"><FileBadge size={16}/> {t[lang].questionProgress} {currentQ + 1}/{questions.length}</span>
+                                    <span>{Math.round(((currentQ + 1) / questions.length) * 100)}%</span>
+                                </div>
+                                <div className="bg-white/90 backdrop-blur p-8 rounded-3xl shadow-xl border border-blue-100 relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-cyan-400"></div>
+                                    <h2 className="text-2xl font-bold text-slate-800 mb-6">{questions[currentQ].q[lang]}</h2>
+                                    <div className="space-y-3">
+                                        {questions[currentQ].options.map((opt, i) => (
+                                            <button key={i} onClick={() => handleAnswer(opt.s)} className="w-full text-left p-4 rounded-xl border border-slate-200 hover:bg-blue-50 hover:border-blue-400 transition font-medium text-slate-700 flex justify-between items-center group bg-white">
+                                                {opt.t[lang]}
+                                                <div className="w-4 h-4 rounded-full border-2 border-slate-300 group-hover:border-blue-500"></div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {view === 'analyzing' && (
+                            <div className="text-center mt-32 fade-in flex flex-col items-center">
+                                <div className="relative">
+                                    <div className="w-20 h-20 border-4 border-blue-100 border-t-blue-700 rounded-full animate-spin"></div>
+                                    <div className="absolute inset-0 flex items-center justify-center"><BrainCircuit className="text-blue-700" size={32} /></div>
+                                </div>
+                                <p className="mt-6 text-xl text-blue-900 font-bold">{t[lang].analyzing}</p>
+                            </div>
+                        )}
+
+                        {view === 'result' && (
+                            <div className="fade-in py-8">
+                                <h2 className="text-3xl font-extrabold text-center text-blue-900 mb-10">{t[lang].resultTitle}</h2>
+                                <div className="grid lg:grid-cols-3 gap-8">
+                                    {/* Top 1 */}
+                                    <div className="lg:col-span-2 bg-white rounded-3xl shadow-xl border border-blue-200 overflow-hidden flex flex-col">
+                                        <div className={`${specsData[getSortedResults()[0]].bg} p-8 border-b ${specsData[getSortedResults()[0]].border} flex gap-6 items-start`}>
+                                            <div className="bg-white p-4 rounded-2xl shadow-md text-slate-700 hidden sm:block">{specsData[getSortedResults()[0]].icon}</div>
+                                            <div>
+                                                <div className="text-xs font-bold uppercase text-blue-800 mb-2 bg-white/60 inline-block px-2 py-1 rounded border border-blue-100">{t[lang].matchRole}</div>
+                                                <h3 className={`text-3xl font-extrabold ${specsData[getSortedResults()[0]].color} mb-2`}>{t[lang].specNames[getSortedResults()[0]]}</h3>
+                                                <p className="text-slate-700">{specsData[getSortedResults()[0]].content[lang].desc}</p>
+                                            </div>
+                                        </div>
+                                        <div className="p-8 flex-1 flex flex-col">
+                                            <div className="bg-blue-50/50 p-5 rounded-2xl border-l-4 border-blue-600 mb-6">
+                                                <h4 className="font-bold text-blue-900 mb-1 flex items-center gap-2"><Lightbulb size={18} className="text-amber-500"/> {t[lang].meaning}</h4>
+                                                <p className="italic text-blue-800 text-lg">"{specsData[getSortedResults()[0]].content[lang].meaning}"</p>
+                                            </div>
+                                            <div className="mb-6">
+                                                <h4 className="font-bold text-slate-700 mb-3 flex items-center gap-2 text-sm uppercase"><Briefcase size={16}/> {t[lang].roles}</h4>
+                                                <div className="flex flex-wrap gap-2">{specsData[getSortedResults()[0]].content[lang].roles.map((r, i) => <span key={i} className="px-3 py-1 bg-slate-50 border rounded-lg text-sm text-slate-700">{r}</span>)}</div>
+                                            </div>
+                                            <button onClick={() => { setSelectedSpec(specsData[getSortedResults()[0]]); setView('roadmap'); }} className={`w-full ${specsData[getSortedResults()[0]].btn} text-white font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 mt-auto`}>
+                                                <Map size={20} /> {t[lang].viewRoadmap}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {/* Top 2 & Chart */}
+                                    <div className="flex flex-col gap-6">
+                                        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-lg relative overflow-hidden">
+                                            <div className={`absolute top-0 left-0 w-2 h-full ${specsData[getSortedResults()[1]].bg.replace('bg-', 'bg-').replace('50', '500')}`}></div>
+                                            <div className="text-xs font-bold uppercase text-slate-400 mb-4">{t[lang].backupRole}</div>
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <div className={`${specsData[getSortedResults()[1]].color} bg-slate-50 p-2 rounded-lg`}>{specsData[getSortedResults()[1]].icon}</div>
+                                                <h3 className={`text-lg font-bold ${specsData[getSortedResults()[1]].color}`}>{t[lang].specNames[getSortedResults()[1]]}</h3>
+                                            </div>
+                                            <div className="bg-slate-50 p-3 rounded-lg text-sm italic text-slate-600 mb-4 border border-slate-100">"{specsData[getSortedResults()[1]].content[lang].meaning}"</div>
+                                            <button onClick={() => { setSelectedSpec(specsData[getSortedResults()[1]]); setView('roadmap'); }} className="w-full py-2 border border-blue-200 text-blue-700 font-bold rounded-lg hover:bg-blue-50 flex justify-center items-center gap-1">
+                                                Xem chi tiết <ArrowRight size={14}/>
+                                            </button>
+                                        </div>
+                                        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+                                            <h4 className="font-bold text-slate-800 mb-4 flex gap-2 text-sm uppercase"><BarChart3 size={16}/> {t[lang].chartTitle}</h4>
+                                            <div className="space-y-3">
+                                                {getSortedResults().slice(0,5).map(key => (
+                                                    <div key={key} className="flex items-center gap-2 text-xs">
+                                                        <span className="w-6 font-bold text-slate-400 text-right">{scores[key]}</span>
+                                                        <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                            <div className={`h-full rounded-full ${key === getSortedResults()[0] ? 'bg-blue-600' : 'bg-slate-300'}`} style={{width: `${(scores[key]/(scores[getSortedResults()[0]]||1))*100}%`}}></div>
+                                                        </div>
+                                                        <span className="font-bold text-slate-500 w-6">{key}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {view === 'roadmap' && (
+                            <div className="fade-in py-8">
+                                <button onClick={() => setView('result')} className="mb-8 flex items-center gap-2 text-slate-500 hover:text-blue-800 font-bold bg-white px-4 py-2 rounded-full shadow-sm w-fit"><ArrowRight className="rotate-180" size={20} /> {t[lang].back}</button>
+                                <div className="text-center mb-16">
+                                    <div className={`inline-block p-6 rounded-3xl ${selectedSpec.bg} mb-6 border-4 border-white shadow-xl`}>
+                                        <div className={selectedSpec.color}>{selectedSpec.icon}</div>
+                                    </div>
+                                    <h2 className={`text-3xl md:text-5xl font-extrabold ${selectedSpec.color} mb-2`}>{t[lang].roadmapTitle}</h2>
+                                    <p className="text-xl text-slate-600 font-medium bg-white/60 inline-block px-4 py-1 rounded-full">{t[lang].specNames[selectedSpec.id]}</p>
+                                </div>
+                                <div className="space-y-12 relative max-w-4xl mx-auto">
+                                    <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-200 md:left-1/2 md:-translate-x-1/2"></div>
+                                    {selectedSpec.content[lang].roadmap.map((step, idx) => (
+                                        <div key={idx} className={`relative flex flex-col md:flex-row gap-8 ${idx % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
+                                            <div className="absolute left-6 w-6 h-6 bg-white border-4 border-blue-600 rounded-full md:left-1/2 transform -translate-x-1/2 mt-8 z-10 shadow-md"></div>
+                                            <div className="ml-16 md:ml-0 md:w-1/2">
+                                                <div className="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 hover:shadow-2xl transition relative overflow-hidden group">
+                                                    <div className={`absolute top-0 left-0 w-2 h-full ${selectedSpec.bg.replace('bg-', 'bg-').replace('50', '600')}`}></div>
+                                                    <div className="flex justify-between items-start mb-6">
+                                                        <span className="inline-block px-4 py-1.5 bg-slate-100 text-slate-700 rounded-full text-xs font-bold uppercase tracking-wider">{step.level}</span>
+                                                        <div className="text-xs text-slate-400 font-bold flex items-center gap-1 bg-slate-50 px-2 py-1 rounded"><Clock size={12}/> {step.duration}</div>
+                                                    </div>
+                                                    <div className="flex items-center gap-4 mb-6 bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100">
+                                                        <div className="bg-emerald-100 p-2 rounded-xl text-emerald-700"><DollarSign size={24} /></div>
+                                                        <div>
+                                                            <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wide">{t[lang].salary}</p>
+                                                            <p className="text-emerald-900 font-bold text-lg">{step.salary}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-4">
+                                                        <div className="flex items-start gap-3"><GraduationCap className="w-5 h-5 text-orange-500 mt-0.5"/><div><p className="text-xs text-slate-400 font-bold uppercase mb-1">{t[lang].intern}</p><p className="text-slate-800 font-medium text-sm">{step.intern}</p></div></div>
+                                                        <div className="flex items-start gap-3"><Award className="w-5 h-5 text-purple-500 mt-0.5"/><div><p className="text-xs text-slate-400 font-bold uppercase mb-1">{t[lang].certs}</p><p className="text-slate-800 font-medium text-sm">{step.certs}</p></div></div>
+                                                    </div>
+                                                    <div className="mt-6 pt-6 border-t border-slate-100">
+                                                        <h4 className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wide mb-3"><BrainCircuit size={14} /> {t[lang].skills}</h4>
+                                                        <div className="flex flex-wrap gap-2">{step.skills.split(',').map((skill, sIdx) => (<span key={sIdx} className="px-3 py-1 bg-slate-50 text-slate-600 text-xs font-bold rounded-lg border border-slate-200">{skill.trim()}</span>))}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
