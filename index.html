@@ -4,46 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Định Hướng Ngành Dược - Cổng Thông Tin</title>
-    <!-- 1. Cài đặt Tailwind CSS để trang trí đẹp -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- 2. Cấu hình Import Map để tải thư viện trực tiếp từ mạng -->
+    <!-- Cấu hình Import Map chuẩn để chạy mượt trên mọi trình duyệt -->
     <script type="importmap">
     {
       "imports": {
         "react": "https://esm.sh/react@18.2.0",
         "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-        "lucide-react": "https://esm.sh/lucide-react@0.344.0"
+        "lucide-react": "https://esm.sh/lucide-react@0.344.0?external=react"
       }
     }
     </script>
     
-    <!-- 3. Cài đặt Babel để trình duyệt hiểu được code React -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Style bổ sung cho hiệu ứng nền -->
     <style>
         body { font-family: 'Segoe UI', sans-serif; }
         .fade-in { animation: fadeIn 0.5s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        /* Hiệu ứng nền trôi */
         .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.5; animation: float 10s infinite ease-in-out; }
         @keyframes float { 0% { transform: translate(0, 0); } 50% { transform: translate(30px, -30px); } 100% { transform: translate(0, 0); } }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 overflow-x-hidden">
-    <!-- Nơi ứng dụng sẽ hiển thị -->
     <div id="root"></div>
 
-    <!-- CODE LOGIC ỨNG DỤNG -->
     <script type="text/babel" data-type="module">
-        import React, { useState, useEffect } from 'react';
+        import React, { useState } from 'react';
         import { createRoot } from 'react-dom/client';
         import { 
             Activity, HeartPulse, Leaf, Factory, Microscope, Store,
             Briefcase, Lightbulb, Map, ArrowRight, Search, X, Globe, 
             Pill, BrainCircuit, DollarSign, GraduationCap, Award, 
-            Clock, BarChart3, ChevronRight, FileBadge, Syringe, Thermometer
+            Clock, BarChart3, ChevronRight, FileBadge
         } from 'lucide-react';
 
         const App = () => {
@@ -54,22 +48,16 @@
             const [selectedSpec, setSelectedSpec] = useState(null);
             const [showDetailModal, setShowDetailModal] = useState(null);
 
-            // --- NỀN HỌA TIẾT Y TẾ ---
             const MedicalBackground = () => (
                 <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none select-none">
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-cyan-50"></div>
                     <div className="blob bg-blue-200 w-96 h-96 top-[-50px] left-[-50px]"></div>
                     <div className="blob bg-cyan-200 w-80 h-80 bottom-[-50px] right-[-50px]" style={{animationDelay: '2s'}}></div>
-                    
-                    {/* Icon chìm trang trí */}
                     <div className="absolute top-[10%] left-[10%] text-blue-200 opacity-30 transform -rotate-12"><Pill size={120} /></div>
-                    <div className="absolute top-[20%] right-[10%] text-cyan-200 opacity-30 transform rotate-45"><Microscope size={100} /></div>
-                    <div className="absolute bottom-[20%] left-[10%] text-indigo-200 opacity-20 transform rotate-12"><Factory size={140} /></div>
                     <div className="absolute bottom-[10%] right-[20%] text-teal-200 opacity-30"><HeartPulse size={130} /></div>
                 </div>
             );
 
-            // --- DỮ LIỆU ---
             const t = {
                 vi: {
                     title: "Cổng Thông Tin Định Hướng Dược",
@@ -92,13 +80,7 @@
                     roles: "Vị trí nghề nghiệp:",
                     meaning: "Sứ mệnh & Ý nghĩa xã hội:",
                     questionProgress: "Câu hỏi",
-                    specNames: {
-                        LS: "Dược Lâm sàng",
-                        DL: "Dược liệu & Dược học cổ truyền",
-                        CN: "Sản xuất & Phát triển thuốc",
-                        KN: "Kiểm tra Chất lượng thuốc",
-                        KT: "Quản lý & Cung ứng thuốc"
-                    }
+                    specNames: { LS: "Dược Lâm sàng", DL: "Dược liệu & Dược học cổ truyền", CN: "Sản xuất & Phát triển thuốc", KN: "Kiểm tra Chất lượng thuốc", KT: "Quản lý & Cung ứng thuốc" }
                 },
                 en: {
                     title: "Pharmacy Career Portal",
@@ -121,13 +103,7 @@
                     roles: "Job Positions:",
                     meaning: "Mission & Social Impact:",
                     questionProgress: "Question",
-                    specNames: {
-                        LS: "Clinical Pharmacy",
-                        DL: "Medicinal Materials & TCM",
-                        CN: "Drug Production & Development",
-                        KN: "Drug Quality Testing",
-                        KT: "Drug Management & Supply"
-                    }
+                    specNames: { LS: "Clinical Pharmacy", DL: "Medicinal Materials & TCM", CN: "Drug Production & Development", KN: "Drug Quality Testing", KT: "Drug Management & Supply" }
                 }
             };
 
@@ -140,10 +116,10 @@
                             meaning: 'Bạn là "lá chắn an toàn" cuối cùng của bệnh nhân. Kiến thức của bạn giúp giảm thiểu sai sót y khoa, tiết kiệm chi phí điều trị.',
                             roles: ['DS Lâm sàng (Nội/Ngoại/ICU)', 'DS Thông tin thuốc', 'DS Cảnh giác dược (PV)', 'DS Nhà thuốc bệnh viện', 'Chuyên viên Dược chính sách BHYT'],
                             roadmap: [
-                                { level: 'Sinh viên (Năm 4-5)', salary: '0 đ (Học việc)', intern: 'Bệnh viện Đa khoa', duration: '3 - 6 tháng', skills: 'Dược lý, Tương tác thuốc', certs: 'Bảng điểm các môn Lâm sàng' },
-                                { level: 'Tập sự (Sau tốt nghiệp)', salary: '5 - 7 triệu', intern: 'Khoa Dược Bệnh viện', duration: '18 tháng (Bắt buộc)', skills: 'Đọc bệnh án, Kỹ năng giao tiếp', certs: 'Bằng Dược sĩ ĐH' },
-                                { level: 'Dược sĩ Lâm sàng', salary: '10 - 15 triệu', intern: 'Không', duration: 'Làm chính thức', skills: 'Phân tích ca lâm sàng, Tư vấn', certs: 'Chứng chỉ hành nghề (CCHN) Dược, CME' },
-                                { level: 'Trưởng Khoa / Chuyên gia', salary: '25 - 40+ triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Quản lý, Xây dựng phác đồ', certs: 'CKI, CKII, Thạc sĩ Dược lý - DSLS' }
+                                { level: 'Sinh viên', salary: '0 đ (Học việc)', intern: 'Bệnh viện Đa khoa', duration: '3 - 6 tháng', skills: 'Dược lý, Tương tác thuốc', certs: 'Bảng điểm các môn Lâm sàng' },
+                                { level: 'Tập sự', salary: '5 - 7 triệu', intern: 'Khoa Dược Bệnh viện', duration: '18 tháng', skills: 'Đọc bệnh án, Kỹ năng giao tiếp', certs: 'Bằng Dược sĩ ĐH' },
+                                { level: 'Dược sĩ Lâm sàng', salary: '10 - 15 triệu', intern: 'Không', duration: 'Chính thức', skills: 'Phân tích ca lâm sàng, Tư vấn', certs: 'CCHN Dược, CME' },
+                                { level: 'Trưởng Khoa', salary: '25 - 40+ triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Quản lý, Xây dựng phác đồ', certs: 'CKI, CKII, Thạc sĩ Dược lý' }
                             ]
                         },
                         en: { desc: 'Optimize drug use, ensure safety.', meaning: 'Patient safety shield.', roles: ['Clinical Pharmacist', 'Drug Info'], roadmap: [{ level: 'Student', salary: 'None', intern: 'Hospital', duration: '3-6mo', skills: 'Pharmacology', certs: 'Transcript' }] }
@@ -157,9 +133,9 @@
                             meaning: 'Bạn là người "thổi hồn" vào cây cỏ, biến kinh nghiệm dân gian thành sản phẩm khoa học.',
                             roles: ['Nghiên cứu viên (R&D) Dược liệu', 'Quản lý vùng trồng (GACP)', 'Kiểm nghiệm Dược liệu', 'Sản xuất Đông dược', 'Kinh doanh Dược liệu'],
                             roadmap: [
-                                { level: 'Sinh viên', salary: 'Hỗ trợ', intern: 'Viện Dược liệu / Vườn', duration: '2 - 3 tháng', skills: 'Thực vật học', certs: 'Chứng nhận thực tập' },
-                                { level: 'KTV / Dược sĩ', salary: '8 - 12 triệu', intern: 'Công ty Đông dược', duration: 'Thử việc 2 tháng', skills: 'Chiết xuất, Bào chế đông dược', certs: 'Bằng ĐH/CĐ Dược' },
-                                { level: 'Chuyên gia R&D', salary: '15 - 25 triệu', intern: 'Không', duration: 'Làm chính thức', skills: 'Phát triển sản phẩm mới, GACP', certs: 'Chứng chỉ GACP-WHO' },
+                                { level: 'Sinh viên', salary: 'Hỗ trợ', intern: 'Viện Dược liệu', duration: '2 - 3 tháng', skills: 'Thực vật học', certs: 'Chứng nhận thực tập' },
+                                { level: 'Kỹ thuật viên', salary: '8 - 12 triệu', intern: 'Công ty Đông dược', duration: '2 tháng', skills: 'Chiết xuất, Bào chế', certs: 'Bằng ĐH/CĐ Dược' },
+                                { level: 'Chuyên gia R&D', salary: '15 - 25 triệu', intern: 'Không', duration: 'Chính thức', skills: 'Phát triển sản phẩm mới, GACP', certs: 'Chứng chỉ GACP-WHO' },
                                 { level: 'Giám đốc Dự án', salary: '30 - 50 triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Quản lý dự án, Xuất khẩu', certs: 'Tiến sĩ' }
                             ]
                         },
@@ -170,12 +146,12 @@
                     id: 'CN', icon: <Factory className="w-10 h-10" />, color: 'text-indigo-800', bg: 'bg-indigo-50', border: 'border-indigo-200', btn: 'bg-indigo-700 hover:bg-indigo-800',
                     content: {
                         vi: {
-                            desc: 'Nghiên cứu công thức, quy trình sản xuất và đăng ký lưu hành thuốc tại các nhà máy Dược phẩm.',
-                            meaning: 'Bạn là "kiến trúc sư" tạo ra viên thuốc. Đảm bảo thuốc sản xuất ra có chất lượng đồng nhất.',
+                            desc: 'Nghiên cứu công thức, quy trình sản xuất và đăng ký lưu hành thuốc tại nhà máy.',
+                            meaning: 'Kiến trúc sư của viên thuốc. Đảm bảo thuốc sản xuất ra có chất lượng đồng nhất.',
                             roles: ['R&D Bào chế', 'R&D Phương pháp phân tích', 'Chuyên viên Đăng ký thuốc (RA)', 'Giám sát sản xuất', 'Kế hoạch sản xuất'],
                             roadmap: [
                                 { level: 'Sinh viên', salary: 'Phụ cấp', intern: 'Nhà máy GMP', duration: '3 - 6 tháng', skills: 'Bào chế, Công nghiệp dược', certs: 'Tiếng Anh chuyên ngành' },
-                                { level: 'Nhân viên', salary: '9 - 14 triệu', intern: 'Nhà máy', duration: 'Thử việc 2 tháng', skills: 'Vận hành máy, SOP', certs: 'Chứng chỉ GMP' },
+                                { level: 'Nhân viên', salary: '9 - 14 triệu', intern: 'Nhà máy', duration: '2 tháng', skills: 'Vận hành máy, SOP', certs: 'Chứng chỉ GMP' },
                                 { level: 'Quản lý R&D', salary: '20 - 35 triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Quản lý dự án, Công thức', certs: 'Thạc sĩ CN Dược' },
                                 { level: 'GĐ Nhà máy', salary: '50 - 100 triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Chiến lược, Tối ưu', certs: 'MBA, Six Sigma' }
                             ]
@@ -187,13 +163,13 @@
                     id: 'KN', icon: <Microscope className="w-10 h-10" />, color: 'text-cyan-800', bg: 'bg-cyan-50', border: 'border-cyan-200', btn: 'bg-cyan-700 hover:bg-cyan-800',
                     content: {
                         vi: {
-                            desc: 'Kiểm tra, giám sát chất lượng thuốc thông qua các phép thử hóa lý, vi sinh.',
-                            meaning: 'Bạn là "người gác cổng" nghiêm khắc. Chữ ký của bạn là lời cam kết về sự an toàn.',
+                            desc: 'Kiểm tra chất lượng thuốc qua các phép thử hóa lý, vi sinh.',
+                            meaning: 'Người gác cổng nghiêm khắc. Ngăn chặn thuốc kém chất lượng ra thị trường.',
                             roles: ['Kiểm nghiệm viên Hóa lý', 'Kiểm nghiệm viên Vi sinh', 'Chuyên viên QA', 'Thẩm định viên', 'IPC'],
                             roadmap: [
-                                { level: 'Sinh viên', salary: 'Phụ cấp', intern: 'Phòng Lab', duration: '2 - 3 tháng', skills: 'Hóa phân tích, Cẩn thận', certs: 'Bảng điểm Hóa' },
-                                { level: 'Kiểm nghiệm viên', salary: '8 - 13 triệu', intern: 'Phòng QC', duration: 'Thử việc 2 tháng', skills: 'HPLC, GC, Vi sinh', certs: 'GLP, ISO 17025' },
-                                { level: 'Trưởng nhóm', salary: '16 - 25 triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Thẩm định phương pháp', certs: 'Chứng chỉ Thẩm định' },
+                                { level: 'Sinh viên', salary: 'Phụ cấp', intern: 'Phòng Lab', duration: '2 - 3 tháng', skills: 'Hóa phân tích', certs: 'Bảng điểm Hóa' },
+                                { level: 'Kiểm nghiệm viên', salary: '8 - 13 triệu', intern: 'Phòng QC', duration: '2 tháng', skills: 'HPLC, Vi sinh', certs: 'GLP, ISO 17025' },
+                                { level: 'Trưởng nhóm', salary: '16 - 25 triệu', intern: 'Không', duration: 'Chính thức', skills: 'Thẩm định phương pháp', certs: 'Chứng chỉ Thẩm định' },
                                 { level: 'GĐ Chất lượng', salary: '40 - 60 triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Quản lý rủi ro', certs: 'Lead Auditor' }
                             ]
                         },
@@ -204,14 +180,14 @@
                     id: 'KT', icon: <Store className="w-10 h-10" />, color: 'text-sky-800', bg: 'bg-sky-50', border: 'border-sky-200', btn: 'bg-sky-700 hover:bg-sky-800',
                     content: {
                         vi: {
-                            desc: 'Quản lý chuỗi cung ứng, kinh doanh, tiếp thị và đấu thầu thuốc vào bệnh viện.',
-                            meaning: 'Bạn là "cầu nối" đưa thuốc đến tay người cần. Đảm bảo dòng chảy của thuốc thông suốt.',
+                            desc: 'Kinh doanh, tiếp thị, đấu thầu và quản lý chuỗi cung ứng thuốc.',
+                            meaning: 'Cầu nối đưa thuốc đến tay người cần. Đảm bảo dòng chảy thuốc thông suốt.',
                             roles: ['Trình dược viên', 'Quản lý sản phẩm (PM)', 'Key Account Manager (KAM)', 'Chuyên viên Đấu thầu', 'Chuỗi cung ứng'],
                             roadmap: [
                                 { level: 'Sinh viên', salary: 'Hoa hồng', intern: 'Nhà thuốc', duration: 'Part-time', skills: 'Giao tiếp, Tin học', certs: 'Kỹ năng mềm' },
                                 { level: 'Nhân viên', salary: '10 - 20 triệu', intern: 'Công ty Dược', duration: '1 tháng', skills: 'Bán hàng', certs: 'Thẻ Trình dược viên' },
                                 { level: 'Quản lý', salary: '30 - 50 triệu', intern: 'Không', duration: 'Chính thức', skills: 'Marketing', certs: 'MBA' },
-                                { level: 'GĐ Kinh doanh', salary: '60 - 100+ triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Chiến lược, Tài chính', certs: 'Lãnh đạo cao cấp' }
+                                { level: 'GĐ Kinh doanh', salary: '60 - 100+ triệu', intern: 'Không', duration: 'Lâu dài', skills: 'Chiến lược', certs: 'Lãnh đạo cao cấp' }
                             ]
                         },
                         en: { desc: 'Supply chain and sales.', meaning: 'Bridge delivering drugs.', roles: ['Medical Rep', 'PM'], roadmap: [{ level: 'Student', salary: 'Commission', intern: 'Pharmacy', duration: 'Part-time', skills: 'Comm', certs: 'Soft Skills' }] }
@@ -253,7 +229,6 @@
             const getSortedResults = () => Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
             const reset = () => { setScores({ LS: 0, CN: 0, KN: 0, KT: 0, DL: 0 }); setCurrentQ(0); setView('home'); };
 
-            // COMPONENTS UI
             const DetailModal = () => {
                 if (!showDetailModal) return null;
                 const spec = specsData[showDetailModal];
@@ -305,7 +280,6 @@
             return (
                 <div className="min-h-screen bg-slate-50 relative font-sans text-slate-900 pb-20">
                     <MedicalBackground />
-                    {/* Header */}
                     <div className="flex justify-between items-center px-4 py-3 bg-white/90 backdrop-blur-sm shadow-sm border-b border-blue-100 sticky top-0 z-40">
                         <div className="flex items-center gap-2 cursor-pointer" onClick={reset}>
                             <div className="bg-blue-800 p-2 rounded-lg text-white"><Pill size={24} /></div>
@@ -377,7 +351,6 @@
                             <div className="fade-in py-8">
                                 <h2 className="text-3xl font-extrabold text-center text-blue-900 mb-10">{t[lang].resultTitle}</h2>
                                 <div className="grid lg:grid-cols-3 gap-8">
-                                    {/* Top 1 */}
                                     <div className="lg:col-span-2 bg-white rounded-3xl shadow-xl border border-blue-200 overflow-hidden flex flex-col">
                                         <div className={`${specsData[getSortedResults()[0]].bg} p-8 border-b ${specsData[getSortedResults()[0]].border} flex gap-6 items-start`}>
                                             <div className="bg-white p-4 rounded-2xl shadow-md text-slate-700 hidden sm:block">{specsData[getSortedResults()[0]].icon}</div>
@@ -401,7 +374,6 @@
                                             </button>
                                         </div>
                                     </div>
-                                    {/* Top 2 & Chart */}
                                     <div className="flex flex-col gap-6">
                                         <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-lg relative overflow-hidden">
                                             <div className={`absolute top-0 left-0 w-2 h-full ${specsData[getSortedResults()[1]].bg.replace('bg-', 'bg-').replace('50', '500')}`}></div>
